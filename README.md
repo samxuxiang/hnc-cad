@@ -1,4 +1,4 @@
-# Hierarchical Neural Coding for Controllable CAD Model Generation
+# Hierarchical Neural Coding for Controllable CAD Model Generation (ICML 2023)
 
 [![arXiv](https://img.shields.io/badge/📃-arXiv%20-red.svg)](https://arxiv.org/abs/2303.01818)
 [![webpage](https://img.shields.io/badge/🌐-Website%20-blue.svg)](https://wordasimage.github.io/Word-As-Image-Page/) 
