@@ -240,48 +240,20 @@ You can also run this in parallel, for example, with 10 processes, by adding the
 Once you train on the new dataset, a preprocessing step of the dataset will be performed. The point cloud sampling and normalized label directories and files will be created under the dataset directory. Refer to the `Download the datasets` section at the top of this readme for the directory structure.
 
 
-## Stability metric (20 CPUs setup is recommended)
-To evaluate a tested dataset phase using our _stability metric_ use the following command:
 
-```bash
-cd GeoCode/stability_metric
-python stability_parallel.py --blender-exe ~/Blender/blender-3.2.0-linux-x64/blender --dir-path ~/datasets/ChairDataset/val/obj_gt
+
+## Acknowledgement
+Our implementation is based ob Stable Diffusion text-to-image model from Hugging Face's [Diffusers](https://github.com/huggingface/diffusers) library, combined with [Diffvg](https://github.com/BachiLi/diffvg). The framework is built on [Live](https://github.com/Picsart-AI-Research/LIVE-Layerwise-Image-Vectorization).
+    
+## Citation
+If you use this code for your research, please cite the following work: 
 ```
-
-## Additional scripts
-
-In our tests we also used [COSEG dataset](http://irc.cs.sdu.edu.cn/~yunhai/public_html/ssl/ssd.htm). A preprocessing step is required when working with external datasets.
-- 3D shapes should be in .obj format
-- 3D shapes should be normalized before training or testing
-
-we provide a command to download an additional script that allows working with COSEG samples.
-Additionally, we provide the code to simplify a dataset (mesh simplification).
-Please refer to the README.md file that is downloaded along with the scripts after executing the following command:
-
-```bash
-cd GeoCode
-scripts/download_ds_processing_scripts.py
-~/Blender/blender-3.2.0-linux-x64/blender -b --python dataset_processing/prepare_coseg.py -- --help
-```
-
-## Code structure
-
-- `common` - util packages and classes that are shared by multiple other directories
-- `config` - contains the neptune.ai configurations file
-- `data` - dataset related classes
-- `dataset_processing` - scripts that are intended to manipulate existing datasets
-- `geocode` - main training and testing code
-- `models` - point cloud and sketch encoders and the decoders network
-- `scripts` - contains script to set up our datasets and saved checkpoints 
-- `stability_metric` - script to evaluate a tested phase using our *stability metric*
-- `visualize_results` - script to generate the renders for all ground truth and predicted shapes
-
-# Citation
-```
-@article{pearl2022geocode,
-  title={GeoCode: Interpretable Shape Programs},
-  author={Pearl, Ofek and Lang, Itai and Hu, Yuhua and Yeh, Raymond A. and Hanocka, Rana},
-  booktitle={arXiv preprint arxiv:2212.11715},
-  year={2022}
+@misc{iluz2023wordasimage,
+      title={Word-As-Image for Semantic Typography}, 
+      author={Shir Iluz and Yael Vinker and Amir Hertz and Daniel Berio and Daniel Cohen-Or and Ariel Shamir},
+      year={2023},
+      eprint={2303.01818},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
 }
 ```
