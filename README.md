@@ -52,10 +52,10 @@ After the raw data is downloaded, run the follow script to get Solid, Profile, L
     sh scripts/process.sh
 
 
-Perform data deduplication
-```bash
-sh scripts/deduplicate.sh
-```
+Run the data deduplication script, this will output post-filtered data as ```train_deduplicate.pkl```
+
+    sh scripts/deduplicate.sh
+
 
 
 ## Usage
