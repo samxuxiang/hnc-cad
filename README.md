@@ -32,9 +32,9 @@ A demo video of our program is available on our <a href="https://threedle.github
 ### Dependencies
 - PyTorch >= 1.10
 - Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
-- Install other dependencies with ``` pip install -r requirements.txt```
+- Install other dependencies with ```pip install -r requirements.txt```
 
-We also provide the docker image [here](https://hub.docker.com/r/samxuxiang/skexgen). Note: only tested on CUDA 11.4. 
+We also provide the [docker image](https://hub.docker.com/r/samxuxiang/skexgen). Note: only tested on CUDA 11.4. 
 
 
 ## Dataset 
