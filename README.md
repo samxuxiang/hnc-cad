@@ -48,9 +48,9 @@ You can run the following script to download our post-processed raw data
 
 
 After the raw data is downloaded, run the follow script to get Solid, Profile, Loop and Model data sequences
-```bash
-sh scripts/process.sh
-```
+
+    sh scripts/process.sh
+
 
 Perform data deduplication
 ```bash
