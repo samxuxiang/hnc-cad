@@ -42,11 +42,11 @@ We also provide the docker image [here](https://hub.docker.com/r/samxuxiang/skex
 
 ## Training the model
 
-Download our processed DeepCAD dataset.
+Download the processed DeepCAD dataset.
 ```bash
 python scripts/download.py
 ```
-Original data is available [here](https://github.com/ChrisWu1997/DeepCAD). Follow the processing steps listed [here](https://github.com/samxuxiang/SkexGen) if you want to process your own data.
+Original data is available [here](https://github.com/ChrisWu1997/DeepCAD). Follow the processing steps in [here](https://github.com/samxuxiang/SkexGen) for processing your own data.
 
 ## Running the test-set evaluation using our dataset and saved checkpoint
 
