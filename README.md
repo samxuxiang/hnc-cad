@@ -26,11 +26,12 @@ A demo video of our program is available on our <a href="https://threedle.github
 - PyTorch >= 1.10
 - CUDA >= 11.4
 - GPU with 24 GB ram recommended
+- Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
 - Install other dependencies:
     ```
     pip install -r requirements.txt
     ```
-- Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
+- We also provide the docker image. You can download it from [dockerhub](https://hub.docker.com/r/samxuxiang/skexgen) (~10GB). 
 
 ## Running the test-set evaluation using our dataset and saved checkpoint
 
