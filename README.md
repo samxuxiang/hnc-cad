@@ -12,22 +12,25 @@
 Computer Aided Design (CAD) that 1) represents high-level design concepts of a CAD model as a
 three-level hierarchical tree of neural codes, from global part arrangement down to local curve geometry; and 2) controls the generation of CAD models by specifying the target design using a code tree. Our method supports diverse and higher-quality generation; novel user controls while specifying design intent; and autocompleting a partial CAD model under construction.
 
-<p align="center">
+<!-- <p align="center">
 <img src="https://github.com/threedle/GeoCode/releases/download/v.1.0.0/demo_video_chair.gif" width=250 alt="3D shape recovery"/>
 <img src="https://github.com/threedle/GeoCode/releases/download/v.1.0.0/demo_video_vase.gif" width=250 alt="3D shape recovery"/>
 <img src="https://github.com/threedle/GeoCode/releases/download/v.1.0.0/demo_video_table.gif" width=250 alt="3D shape recovery"/>
 </p>
 <p align="center">
 A demo video of our program is available on our <a href="https://threedle.github.io/GeoCode/">project page</a>.
-</p>
+</p> -->
 
 ## Requirements
 - Python 3.8
-- CUDA 11.8
-- GPU, minimum 8 GB ram
-- During training, a machine with 5 CPUs is recommended 
-- During _visualization_ and _sketch generation_, we recommend a setup with multiple GPU nodes, refer to the additional information to run in parallel on all available nodes
-- During test-set evaluation, generation of raw shapes for a new dataset, and during _stability metric_ evaluation, a single node with 20 CPUs is recommended
+- PyTorch >= 1.10
+- CUDA >= 11.4
+- GPU with 24 GB ram recommended
+- Install other dependencies:
+    ```
+    pip install -r requirements.txt
+    ```
+- Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
 
 ## Running the test-set evaluation using our dataset and saved checkpoint
 
