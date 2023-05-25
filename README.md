@@ -40,9 +40,19 @@ A demo video of our program is available on our <a href="https://threedle.github
 We also provide the docker image [here](https://hub.docker.com/r/samxuxiang/skexgen). Note: only tested on CUDA 11.4. 
 
 
+## Dataset 
+We use the dataset from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD) for training and evaluation.
+
+The sketch-and-extrude sequence is converted to obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen).
+
+You can download our post-processed data 
+```bash
+python scripts/download.py
+```
+
 ## Training the model
 
-Download our parsed DeepCAD data
+Download our parsed DeepCAD data:
 ```bash
 python scripts/download.py
 ```
