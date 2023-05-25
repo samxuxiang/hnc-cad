@@ -47,7 +47,7 @@ You can run the following script to download our post-processed raw data
     python scripts/download.py
 
 
-After the raw data is downloaded, run the follow script to get Solid, Profile, Loop and Model data sequences
+After the raw data is downloaded, run this script to get Solid, Profile, Loop and Model data sequences
 
     sh scripts/process.sh
 
