@@ -40,7 +40,7 @@ We also provide the [docker image](https://hub.docker.com/r/samxuxiang/skexgen).
 ## Dataset 
 We use the dataset from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD) for training and evaluation.
 
-The sketch-and-extrude sequence is converted to obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen). This step is time-consuming and you can just download our post-processed data 
+The sketch-and-extrude sequence needs to be converted to our obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen). This step is time-consuming and you can run the following script to download our post-processed data 
 
     python scripts/download.py
 
