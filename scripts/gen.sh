@@ -18,8 +18,3 @@ python gen/convert.py --data_folder proj_log/rand
 # visualize CAD 
 python gen/cad_img.py --input_dir proj_log/rand --output_dir  proj_log/rand_visual
 
-######## EVALUATION ##########
-python gen/sample_points.py --in_dir proj_log/rand --out_dir pcd 
-python gen/eval_cad.py --fake proj_log/rand --real data/test_set
-
-
