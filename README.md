@@ -36,17 +36,17 @@ A demo video of our program is available on our <a href="https://threedle.github
     ```
     pip install -r requirements.txt
     ```
-### Docker
-We provide our docker image [here](https://hub.docker.com/r/samxuxiang/skexgen). Note: only tested on CUDA 11.4. 
+
+We also provide the docker image [here](https://hub.docker.com/r/samxuxiang/skexgen). Note: only tested on CUDA 11.4. 
 
 
 ## Training the model
 
-Download our processed DeepCAD dataset, original data is available [here](https://github.com/ChrisWu1997/DeepCAD). Follow the processing steps [here](https://github.com/samxuxiang/SkexGen) if you want to process your own data.
+Download our processed DeepCAD dataset.
 ```bash
 python scripts/download.py
 ```
-
+Original data is available [here](https://github.com/ChrisWu1997/DeepCAD). Follow the processing steps listed [here](https://github.com/samxuxiang/SkexGen) if you want to process your own data.
 
 ## Running the test-set evaluation using our dataset and saved checkpoint
 
