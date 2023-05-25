@@ -31,7 +31,7 @@ A demo video of our program is available on our <a href="https://threedle.github
     ```
     pip install -r requirements.txt
     ```
-- We also provide the docker image. You can download it here [dockerhub](https://hub.docker.com/r/samxuxiang/skexgen) (~10GB). 
+- You can also download the docker image [here](https://hub.docker.com/r/samxuxiang/skexgen). 
 
 ## Running the test-set evaluation using our dataset and saved checkpoint
 
