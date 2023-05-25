@@ -45,10 +45,10 @@ We use the dataset from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD) for tr
 
 The sketch-and-extrude sequence is converted to obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen).
 
-You can download our post-processed data 
-```bash
-python scripts/download.py
-```
+You can download the post-processed data 
+
+    python scripts/download.py
+
 
 ## Training the model
 
