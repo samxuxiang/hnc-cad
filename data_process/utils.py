@@ -1,8 +1,6 @@
 import os 
-from pathlib import Path
-import os
-import numpy as np 
-from pathlib import Path
+import numpy as np
+from pathlib import Path 
 from geometry.obj_parser import OBJParser
 import meshio
 

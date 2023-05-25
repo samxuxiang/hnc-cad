@@ -43,7 +43,6 @@ class Loader():
         for data_sample in tqdm(load_iter, total=len(project_folders)):
             samples += data_sample
         
-        print('Splitting data...')
         train_samples = []
         test_samples = []
         val_samples = []

@@ -1,15 +1,10 @@
 import os
 import argparse
-from glob import glob
-from pathlib import Path
-import itertools
 from tqdm import tqdm
 import multiprocessing
 import numpy as np
 from hashlib import sha256
-import pdb
 import pickle
-import json 
 
 
 def hash_model(data):
@@ -79,21 +74,19 @@ if __name__ == "__main__":
         data['tmp_uid'] = idx
  
     # Hash 
-    print('hashing...')
+    print('Removing Duplicate...')
     gen_len = len(dataset)
     gen_groups = parallel_hash(dataset, args.format)
     
-    # Uniqueness
-    print('uniqueness...')
+    # Find unique data
     num_files_in_groups = []
     for g in tqdm(gen_groups.values()):
         num_files_in_group = len(g)
         num_files_in_groups.append(num_files_in_group)
     unique_count = np.sum(np.array(num_files_in_groups)==1)
     unique_percent = (unique_count / gen_len) * 100.0
-    print(f"\tUnique Percentage: {unique_percent:.2f}%")
 
-    print('creating new data...')
+    # Create deduplicate dataste
     unique_uid = {}
     for g in tqdm(gen_groups.values()):
         uid = g[0][0] # only choose one 
