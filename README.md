@@ -40,22 +40,14 @@ We also provide the [docker image](https://hub.docker.com/r/samxuxiang/skexgen).
 ## Dataset 
 We use the dataset from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD) for training and evaluation.
 
-The sketch-and-extrude sequence needs to be converted to our obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen). 
+The sketch-and-extrude sequences need to be converted to our obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen). 
 
-You can run the following script to download our post-processed data 
+You can run the following script to download our post-processed raw data 
 
     python scripts/download.py
 
 
-## Training the model
-
-Download our parsed DeepCAD data:
-```bash
-python scripts/download.py
-```
-You can also follow the steps [here](https://github.com/samxuxiang/SkexGen) to convert the [original data](https://github.com/ChrisWu1997/DeepCAD).
-
-Process the data to Solid, Profile, and Loop sequences
+After the raw data is downloaded, run the follow script to get Solid, Profile, Loop and Model data sequences
 ```bash
 sh scripts/process.sh
 ```
@@ -64,6 +56,11 @@ Perform data deduplication
 ```bash
 sh scripts/deduplicate.sh
 ```
+
+
+## Usage
+
+
 
 Train the three-level codebook
 ```bash
