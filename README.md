@@ -22,16 +22,31 @@ A demo video of our program is available on our <a href="https://threedle.github
 </p> -->
 
 ## Requirements
+
+### Environment
+- Linux
 - Python 3.8
-- PyTorch >= 1.10
 - CUDA >= 11.4
 - GPU with 24 GB ram recommended
+
+### Dependencies
+- PyTorch >= 1.10
 - Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
 - Install other dependencies:
     ```
     pip install -r requirements.txt
     ```
-- You can also download the docker image [here](https://hub.docker.com/r/samxuxiang/skexgen). 
+### Docker
+We provide our docker image [here](https://hub.docker.com/r/samxuxiang/skexgen). Note: only tested on CUDA 11.4. 
+
+
+## Training the model
+
+Download our processed DeepCAD dataset, original data is available [here](https://github.com/ChrisWu1997/DeepCAD). Follow the processing steps [here](https://github.com/samxuxiang/SkexGen) if you want to process your own data.
+```bash
+python scripts/download.py
+```
+
 
 ## Running the test-set evaluation using our dataset and saved checkpoint
 
