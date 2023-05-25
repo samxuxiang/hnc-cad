@@ -47,12 +47,12 @@ You can run the following script to download our post-processed raw data
     python scripts/download.py
 
 
-After the raw data is downloaded, run this script to get the Solid, Profile, Loop and full Model data sequences
+After the raw data is downloaded, run this script to get the Solid, Profile, Loop and full Model data
 
     sh scripts/process.sh
 
 
-Run the data deduplication script, this will output post-filtered data as ```train_deduplicate.pkl```
+Run the deduplication script, this will output post-filtered data as ```train_deduplicate.pkl```
 
     sh scripts/deduplicate.sh
 
