@@ -101,3 +101,9 @@ If you find our work useful in your research, please cite the following paper
   year      = {2023},
 }
 ```
+
+## :hourglass_flowing_sand: UPDATES
+- [x] The data preprocess code is released
+- [x] Model and training code for CAD generation is released
+- [ ] Autocomplete code
+- [ ] Pretrained weights
