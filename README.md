@@ -47,7 +47,7 @@ You can run the following script to download our post-processed raw data
     python scripts/download.py
 
 
-After the raw data is downloaded, run this script to get the Solid, Profile, Loop and full Model data
+After the raw data is downloaded, run this script to get the Solid, Profile, Loop and full CAD Model data
 
     sh scripts/process.sh
 
@@ -59,18 +59,15 @@ Run the deduplication script, this will output post-filtered data as ```train_de
 
 
 ## Usage
+First, train the three-level codebook with
+
+    sh scripts/codebook.sh
+
+After the models are trained, extract the neural codes corresponding to each data with
+
+    sh scripts/extract_code.sh
 
 
-
-Train the three-level codebook
-```bash
-sh scripts/codebook.sh
-```
-
-Train code-tree generator and model generator (random generation)
-```bash
-sh scripts/gen.sh
-```
 
 Train the full model (controllable generation)
 ```bash
