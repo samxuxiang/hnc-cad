@@ -68,11 +68,10 @@ After the codebooks are learned, extract the neural codes corresponding to each 
     sh scripts/extract_code.sh
 
 
+Run the following script for only training the code-tree generator and model generator for random generation 
 
-Train the full model (controllable generation)
-```bash
-sh scripts/gen.sh
-```
+    sh scripts/gen.sh
+
 
 
 ## Acknowledgement
