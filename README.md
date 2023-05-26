@@ -104,6 +104,7 @@ If you find our work useful in your research, please cite the following paper
 
 ## :hourglass_flowing_sand: UPDATES
 - [x] The data preprocess code is released
-- [x] Model and training code for CAD generation is released
-- [ ] Autocomplete code
-- [ ] Pretrained weights
+- [x] Core model code is released
+- [x] CAD generation code is released
+- [ ] CAD autocompletion code
+- [ ] All pretrained weights
