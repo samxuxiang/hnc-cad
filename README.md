@@ -63,7 +63,7 @@ First, train the three-level codebook with
 
     sh scripts/codebook.sh
 
-After the models are trained, extract the neural codes corresponding to each data with
+After the codebooks are learned, extract the neural codes corresponding to each training data with
 
     sh scripts/extract_code.sh
 
