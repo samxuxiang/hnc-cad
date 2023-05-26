@@ -92,7 +92,7 @@ If you want to try CAD generation without training the model, you can download o
 This research is partially supported by NSERC Discovery Grants with Accelerator Supplements and DND/NSERC Discovery Grant Supplement.
     
 ## Citation
-If you use this code for your research, please cite the following work: 
+If you find our work useful in your research, please cite the following paper
 ```
 @inproceedings{xu2023hnc,
   author    = {Xiang Xu, Pradeep Kumar Jayaraman, Joseph G. Lambourne, Karl D.D. Willis, Yasutaka Furukawa},
