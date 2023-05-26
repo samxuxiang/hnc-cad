@@ -74,7 +74,7 @@ Run the following script for training the code-tree generator and model generato
 
 Optionally you can train the full model including model encoder for autocompletion 
 
-    sh scripts/gen.sh
+    sh scripts/ac.sh
 
 After the generative module is trained, running the following script to sample and visualize the results
 
