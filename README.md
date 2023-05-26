@@ -107,4 +107,4 @@ If you find our work useful in your research, please cite the following paper
 - [x] Core model code is released
 - [x] CAD generation code is released
 - [ ] CAD autocompletion code
-- [ ] All pretrained weights
+- [ ] Pretrained weights
