@@ -85,7 +85,7 @@ Run this evaluation code to get JSD, MMD, and COV scores. Warning: this step can
     sh scripts/eval.sh
 
 ## Demo
-If you want to try CAD generation without training the model, you can download our pretrained weights from [here](xxx),  and just run the sample and visualization script  ```sample_gen.sh```. 
+If you want to try CAD generation without training the model, you can download our pretrained weights from [here](xxx),  and then just run the sample and visualization script  ```sample_gen.sh```. This will output 1000 randomly generated CAD models.
 
 
 ## Acknowledgement
