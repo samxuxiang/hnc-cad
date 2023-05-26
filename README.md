@@ -80,7 +80,7 @@ For testing, you can run this script to sample and visualize the results
 
     sh scripts/sample_gen.sh
 
-Run this evaluation code to get JSD, MMD, and COV scores. Warning: this step can be very slow.
+Run the evaluation script to get JSD, MMD, and COV scores. Warning: this step can be very slow.
 
     sh scripts/eval.sh
 
