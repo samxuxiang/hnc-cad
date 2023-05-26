@@ -68,17 +68,24 @@ After the codebooks are learned, extract the neural codes corresponding to each 
     sh scripts/extract_code.sh
 
 
-Run the following script for training the code-tree generator and model generator for random CAD generation 
+Run the following script for training the code-tree generator and model generator for CAD random generation 
 
     sh scripts/gen.sh
 
-Optionally you can train the full model including model encoder for autocompletion 
+Optionally you can train the full model including model encoder for CAD autocompletion 
 
     sh scripts/ac.sh
 
-After the generative module is trained, running the following script to sample and visualize the results
+For testing, you can run this script to sample and visualize the results
 
     sh scripts/sample_gen.sh
+
+Run this evaluation code to get JSD, MMD, and COV scores. Warning: this step can be very slow.
+
+    sh scripts/eval.sh
+
+## Demo
+If you want to try CAD generation without training the model, you can download our pretrained weights from [here](xxx),  and just run the sample and visualization script  ```sample_gen.sh```. 
 
 
 ## Acknowledgement
