@@ -47,7 +47,7 @@ You can run the following script to download our post-processed raw data
     python scripts/download.py
 
 
-After the raw data is downloaded, run this script to get the Solid, Profile, Loop and full CAD Model data
+After the raw data is downloaded, run this script to get the solid, profile, loop and full CAD Model data
 
     sh scripts/process.sh
 
@@ -67,30 +67,33 @@ After the codebooks are learned, extract the neural codes corresponding to each 
 
     sh scripts/extract_code.sh
 
+Pretrained weights for the three codebook networks are available [here](https://drive.google.com/file/d/1AA3OLKFgvmmSojyNLzXANw-FPnZLi8x8/view?usp=sharing). You can also download the extracted codes from [here](https://drive.google.com/file/d/1odP_K7l7TilarYgFHFOOIFMGlvlceuc0/view?usp=sharing)
 
-Run the following script for training the code-tree generator and model generator for CAD random generation 
+
+Run the following script to train the code-tree generator and model generator for unconditional CAD generation
 
     sh scripts/gen.sh
 
-Optionally you can train the full model including model encoder for CAD autocompletion 
+Optionally you can train the full model including model encoder for conditional CAD generation (e.g. autocompletion) 
 
     sh scripts/ac.sh
 
-For testing, you can run this script to sample and visualize the results
+For testing, you can run this script to generate 1000 samples and visualize the results
 
     sh scripts/sample_gen.sh
 
-Run the evaluation script to get JSD, MMD, and COV scores. Warning: this step can be very slow.
+Run this evaluation script to get JSD, MMD, and COV scores. Warning: this step can be very slow.
 
     sh scripts/eval.sh
 
-## Demo
-If you want to try CAD generation without training the model, you can download our pretrained weights from [here](xxx), then just run the sample and visualization script  ```sample_gen.sh```. This outputs 1000 randomly generated models.
+Please also download the test set from [here](https://drive.google.com/file/d/1FhONYaJTK2vkayfDKH5TaHXDyjl2f4f-/view?usp=sharing) and unzip it inside the ```data``` folder. This is required to compute the evaluation metrics.
+
 
 
 ## Acknowledgement
 This research is partially supported by NSERC Discovery Grants with Accelerator Supplements and DND/NSERC Discovery Grant Supplement, NSERC Alliance Grants, and John R. Evans Leaders Fund (JELF).
-    
+
+
 ## Citation
 If you find our work useful in your research, please cite the following paper
 ```

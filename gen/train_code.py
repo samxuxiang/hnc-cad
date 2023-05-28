@@ -5,35 +5,10 @@ from config import *
 from tqdm import tqdm 
 import torch.nn as nn
 import torch.nn.functional as F 
-from model.code import CodeModel
+from model.decoder import CodeDecoder
+from model.network import schedule_with_warmup
 from dataset import CodeData
 from torch.utils.tensorboard import SummaryWriter
-from torch.optim.lr_scheduler import LambdaLR
-
-
-def get_constant_schedule_with_warmup(optimizer, num_warmup_steps, last_epoch = -1):
-    """
-    Create a schedule with a constant learning rate preceded by a warmup period during which the learning rate
-    increases linearly between 0 and the initial lr set in the optimizer.
-
-    Args:
-        optimizer (:class:`~torch.optim.Optimizer`):
-            The optimizer for which to schedule the learning rate.
-        num_warmup_steps (:obj:`int`):
-            The number of steps for the warmup phase.
-        last_epoch (:obj:`int`, `optional`, defaults to -1):
-            The index of the last epoch when resuming training.
-
-    Return:
-        :obj:`torch.optim.lr_scheduler.LambdaLR` with the appropriate schedule.
-    """
-
-    def lr_lambda(current_step: int):
-        if current_step < num_warmup_steps:
-            return float(current_step) / float(max(1.0, num_warmup_steps))
-        return 1.0
-
-    return LambdaLR(optimizer, lr_lambda, last_epoch=last_epoch)
 
 
 def train(args):
@@ -49,13 +24,13 @@ def train(args):
                                              num_workers=6)
     code_size = dataset.solid_unique_num + dataset.profile_unique_num + dataset.loop_unique_num
 
-    model = CodeModel(code_size)
+    model = CodeDecoder(code_size, args.mode)
     model = model.to(device).train()
     
     # Initialize optimizer
     network_parameters = list(model.parameters()) 
     optimizer = torch.optim.AdamW(network_parameters, lr=1e-3)
-    scheduler = get_constant_schedule_with_warmup(optimizer, 2000)
+    scheduler = schedule_with_warmup(optimizer, 2000)
     
     # logging 
     writer = SummaryWriter(log_dir=args.output)
@@ -63,10 +38,10 @@ def train(args):
     # Main training loop
     iters = 0
     print('Start training...')
-    for epoch in range(TOTAL_TRAIN_EPOCH):  
+    for epoch in range(UNCOND_TRAIN_EPOCH):  
         progress_bar = tqdm(total=len(dataloader))
         progress_bar.set_description(f"Epoch {epoch}")
-
+        
         for code, code_mask in dataloader:
             code = code.cuda()
             code_mask = code_mask.cuda()
@@ -111,6 +86,7 @@ if __name__ == "__main__":
     parser.add_argument("--solid_code", type=str, required=True, help='Extracted solid codes (.pkl)')
     parser.add_argument("--profile_code", type=str, required=True, help='Extracted profile codes (.pkl)')
     parser.add_argument("--loop_code", type=str, required=True, help='Extracted loop codes (.pkl)')
+    parser.add_argument("--mode", type=str, required=True, help='uncond | cond')
     args = parser.parse_args()
 
     # Create training folder

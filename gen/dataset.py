@@ -8,7 +8,7 @@ import random
 
 class CADData(torch.utils.data.Dataset):
     """ CAD dataset """
-    def __init__(self, cad_path, solid_path, profile_path, loop_path):   
+    def __init__(self, cad_path, solid_path, profile_path, loop_path, mode, is_training=True):   
         # Load data
         with open(cad_path, 'rb') as f:
             cad_data = pickle.load(f)
@@ -28,6 +28,8 @@ class CADData(torch.utils.data.Dataset):
         self.solid_unique_num = solid_data['unique_num']
         self.profile_unique_num = profile_data['unique_num']
         self.loop_unique_num = loop_data['unique_num']
+        self.mode = mode
+        self.is_training = is_training
 
         # Find matching codes
         self.data = []
@@ -39,6 +41,8 @@ class CADData(torch.utils.data.Dataset):
                 continue 
             solid_code = self.solid_code[solid_uid] + self.loop_unique_num + self.profile_unique_num  # solid code index
             num_se = len(cad['cad_ext'])
+
+            if self.mode == 'cond' and num_se==1:continue #skip single SE for auto-complete
         
             sketchProfileCode = []
             sketchLoopCode = []
@@ -81,7 +85,7 @@ class CADData(torch.utils.data.Dataset):
             total_code+=[-3] # solid
             total_code += [solid_code]
             total_code+=[-4] # END of cuboid
-            total_code = np.array(total_code) + 4
+            total_code = np.array(total_code) + CODE_PAD
 
             # # Hierarchical codes (breadth)
             # total_code=[-1] # solid
@@ -113,12 +117,67 @@ class CADData(torch.utils.data.Dataset):
             vec_data['code'] = total_code
             vec_data['code_mask'] = code_mask
             vec_data['num_se'] = num_se
+            vec_data['cad'] = cad
 
             self.data.append(vec_data)
 
         print(f'Post-Filter: {len(self.data)}, Keep Ratio: {100*len(self.data)/len(cad_data):.2f}%')
 
-    
+
+    def param2pix_par(self, cmd_seq, param_seq, ext_seq):
+        pixel_full = []
+        coord_full = []
+        ext_full = []
+
+        for cmd, param, ext in zip(cmd_seq, param_seq, ext_seq):
+            # Extrude
+            ext_full.append(ext)
+            ext_full.append(np.array([-1]))  # Add -1 for normal cad
+
+            # Sketch
+            coords = []
+            pixels = []
+            for cc, pp in zip(cmd, param):
+                if cc == 6: # circle 
+                    coords.append(pp[0:2])
+                    coords.append(pp[2:4])
+                    coords.append(pp[4:6])
+                    coords.append(pp[6:8])
+                    coords.append(np.array([-1,-1]))
+                elif cc == 5: # arc
+                    coords.append(pp[0:2])
+                    coords.append(pp[2:4])
+                    coords.append(np.array([-1,-1]))
+                elif cc == 4: # line
+                    coords.append(pp[0:2])
+                    coords.append(np.array([-1,-1]))
+                elif cc == 3: # EoL 
+                    coords.append(np.array([-2,-2]))
+                elif cc == 2: # EoF 
+                    coords.append(np.array([-3,-3]))
+                elif cc == 1: # EoS 
+                    coords.append(np.array([-4,-4]))
+
+            for xy in coords:
+                if xy[0] < 0: 
+                    pixels.append(xy[0])
+                else:
+                    pixels.append(xy[1]*(2**CAD_BIT)+xy[0])
+
+            pixel_full.append(pixels)
+            coord_full.append(coords)
+
+        ext_full.append(np.array([-2]))
+        coord_full.append(np.array([-5,-5]))
+        pixel_full += [-5]        
+        
+        ext_full = np.hstack(ext_full) + EXT_PAD
+        coord_full = np.vstack(coord_full) + SKETCH_PAD
+        pixel_full = np.hstack(pixel_full) + SKETCH_PAD
+        
+        return pixel_full, coord_full, ext_full
+        
+
     def param2pix(self, cad):
         pixel_full = []
         coord_full = []
@@ -171,7 +230,7 @@ class CADData(torch.utils.data.Dataset):
         pixel_full = np.hstack(pixel_full) + SKETCH_PAD
         
         return pixel_full, coord_full, ext_full
-
+  
 
     def pad_pixel(self, tokens):
         keys = np.ones(len(tokens))
@@ -215,35 +274,64 @@ class CADData(torch.utils.data.Dataset):
         exts = vec_data['ext']
         ext_mask = vec_data['ext_mask']
 
-        # XY augmentation
-        aug_xys = []
-        for xy in vec_data['coord']:
-            if xy[0] < SKETCH_PAD:
-                aug_xys.append(xy-SKETCH_PAD)  # special END tokens
-            else:
-                new_xy = xy - SKETCH_PAD 
-                new_xy[0] = new_xy[0] + random.randint(-AUG_RANGE, +AUG_RANGE)
-                new_xy[1] = new_xy[1] + random.randint(-AUG_RANGE, +AUG_RANGE) 
-                new_xy = np.clip(new_xy, a_min=0, a_max=2**CAD_BIT-1)         
-                aug_xys.append(new_xy)
-        coords_aug = np.vstack(aug_xys) + SKETCH_PAD
-        
-        # PIX augmentation
-        aug_pix = []
-        for xy in aug_xys:
-            if xy[0] >= 0 and xy[1] >= 0:
-                aug_pix.append(xy[1]*(2**CAD_BIT)+xy[0])
-            else:
-                aug_pix.append(xy[0])
-        pixels_aug = np.hstack(aug_pix) + SKETCH_PAD
+        if self.mode == 'uncond': # unconditional 
+            # XY augmentation
+            aug_xys = []
+            for xy in vec_data['coord']:
+                if xy[0] < SKETCH_PAD:
+                    aug_xys.append(xy-SKETCH_PAD)  # special END tokens
+                else:
+                    new_xy = xy - SKETCH_PAD 
+                    new_xy[0] = new_xy[0] + random.randint(-AUG_RANGE, +AUG_RANGE)
+                    new_xy[1] = new_xy[1] + random.randint(-AUG_RANGE, +AUG_RANGE) 
+                    new_xy = np.clip(new_xy, a_min=0, a_max=2**CAD_BIT-1)         
+                    aug_xys.append(new_xy)
+            coords_aug = np.vstack(aug_xys) + SKETCH_PAD
+            
+            # PIX augmentation
+            aug_pix = []
+            for xy in aug_xys:
+                if xy[0] >= 0 and xy[1] >= 0:
+                    aug_pix.append(xy[1]*(2**CAD_BIT)+xy[0])
+                else:
+                    aug_pix.append(xy[0])
+            pixels_aug = np.hstack(aug_pix) + SKETCH_PAD
 
-        pixels_aug, _ = self.pad_pixel(pixels_aug)
-        coords_aug = self.pad_coord(coords_aug)
-        pixels = vec_data['pixel'] 
-        coords = vec_data['coord']
-        
-        return pixels, coords, sketch_mask, pixels_aug, coords_aug, exts, ext_mask, code, code_mask
+            pixels_aug, _ = self.pad_pixel(pixels_aug)
+            coords_aug = self.pad_coord(coords_aug)
+            pixels = vec_data['pixel'] 
+            coords = vec_data['coord']
 
+            return pixels, coords, sketch_mask, pixels_aug, coords_aug, exts, ext_mask, code, code_mask
+
+        else:  # conditional
+            assert self.mode == 'cond'
+            cad = vec_data['cad']
+            
+            if self.is_training:
+                # Random masking
+                num_token = len(cad['cad_cmd'])
+                masked_ratio = random.uniform(MASK_RATIO_LOW, MASK_RATIO_HIGH)  
+                len_keep = np.clip(round(num_token * (1-masked_ratio)), a_min=1, a_max=num_token-1)
+                noise = np.random.random(num_token)# noise in [0, 1] 
+                ids_shuffle = np.argsort(noise)  # ascend: small is keep, large is remove
+                ids_keep = sorted(ids_shuffle[:len_keep])  
+            else:
+                ids_keep = [0] # keep first one and autocomplete the rest
+
+            # Partial SE
+            cmd_partial = [cad['cad_cmd'][id] for id in ids_keep]
+            param_partial = [cad['cad_param'][id] for id in ids_keep]
+            ext_partial = [cad['cad_ext'][id] for id in ids_keep]
+            pixel_partial, coord_partial, ext_partial =  self.param2pix_par(cmd_partial, param_partial, ext_partial)
+            pixels_par, sketch_mask_par = self.pad_pixel(pixel_partial)
+            coords_par = self.pad_coord(coord_partial)
+            exts_par, ext_mask_par = self.pad_ext(ext_partial)
+            pixels = vec_data['pixel'] 
+            coords = vec_data['coord']
+            
+            return pixels_par, coords_par, sketch_mask_par, exts_par, ext_mask_par, \
+                pixels, coords, sketch_mask, exts, ext_mask, code, code_mask
         
 
 class CodeData(torch.utils.data.Dataset):
@@ -413,5 +501,3 @@ class CodeData(torch.utils.data.Dataset):
         code_mask = np.zeros(MAX_CODE)==0
         code_mask[:np.where(code==0)[0][0]+1] = False
         return code, code_mask
-
-

@@ -11,7 +11,7 @@ SOLID_TRAIN_PATH = 'data/solid/train_deduplicate.pkl'
 SOLID_FULL_PATH = 'data/solid/train.pkl'
 SOLID_PARAM_SEQ = 6
 MAX_SOLID = 5 
-SOLID_CODEBOOK_DIM = 5000
+SOLID_CODEBOOK_DIM = 10000 
 
 # PROFILE CONFIG
 PROFILE_TRAIN_PATH = 'data/profile/train_deduplicate.pkl'

@@ -6,9 +6,9 @@ from config import *
 import multiprocessing
 from hashlib import sha256
 import numpy as np 
-from model.code import CodeModel
 from dataset import CADData
-from model.decoder import SketchDecoder, ExtDecoder
+from model.encoder import CodeEncoder
+from model.decoder import SketchDecoder, ExtDecoder, CodeDecoder
 from utils import CADparser, write_obj_sample
 
 
@@ -56,25 +56,29 @@ def parse_aug(args):
 def sample(args):
     total_size, bsz, top_p = parse_aug(args)
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
-    dataset = CADData(CAD_TRAIN_PATH, args.solid_code, args.profile_code, args.loop_code)
+    dataset = CADData(CAD_TRAIN_PATH, args.solid_code, args.profile_code, args.loop_code, mode='uncond')
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=False, 
                                              batch_size=1024,
                                              num_workers=4)
     code_size = dataset.solid_unique_num + dataset.profile_unique_num + dataset.loop_unique_num
-   
+    
     # Load model weights
-    tokenPredS = SketchDecoder(code_size) 
+    tokenPredS = SketchDecoder() 
     tokenPredS.load_state_dict(torch.load(os.path.join(args.cad_weight, 'sketch_dec_epoch_350.pt')))
     tokenPredS = tokenPredS.cuda().eval()
 
-    tokenPredE = ExtDecoder(code_size) 
+    tokenPredE = ExtDecoder() 
     tokenPredE.load_state_dict(torch.load(os.path.join(args.cad_weight, 'ext_dec_epoch_350.pt')))
     tokenPredE = tokenPredE.cuda().eval()
 
-    codePred = CodeModel(code_size)
+    codePred = CodeDecoder(code_size, mode='uncond')
     codePred.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_350.pt')))
     codePred = codePred.cuda().eval()
+
+    code_enc = CodeEncoder(code_size)
+    code_enc.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_350.pt')))
+    code_enc = code_enc.to(device).train()
 
     # Random sampling 
     sample_cad = []
