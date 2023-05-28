@@ -59,7 +59,9 @@ Run the deduplication script, this will output post-filtered data as ```train_de
 
 
 ## Usage
-First, train the three-level codebook with
+
+### Codebook 
+Train the three-level codebook with
 
     sh scripts/codebook.sh
 
@@ -67,26 +69,36 @@ After the codebooks are learned, extract the neural codes corresponding to each 
 
     sh scripts/extract_code.sh
 
-Pretrained weights for the three codebook networks are available [here](https://drive.google.com/file/d/1AA3OLKFgvmmSojyNLzXANw-FPnZLi8x8/view?usp=sharing). You can also download the extracted codes from [here](https://drive.google.com/file/d/1odP_K7l7TilarYgFHFOOIFMGlvlceuc0/view?usp=sharing)
+Pretrained weights for the three codebook networks are available [here](https://drive.google.com/file/d/1AA3OLKFgvmmSojyNLzXANw-FPnZLi8x8/view?usp=sharing). You can also download the extracted codes from [here](https://drive.google.com/file/d/1odP_K7l7TilarYgFHFOOIFMGlvlceuc0/view?usp=sharing).
 
 
-Run the following script to train the code-tree generator and model generator for unconditional CAD generation
+### Random Generation
+Run the following script to train the code-tree generator and model generator for unconditional generation
 
-    sh scripts/gen.sh
+    sh scripts/gen_uncond.sh
 
-Optionally you can train the full model including model encoder for conditional CAD generation (e.g. autocompletion) 
+For testing, run this script to generate 1000 CAD samples and visualize the results
 
-    sh scripts/ac.sh
+    sh scripts/sample_uncond.sh
 
-For testing, you can run this script to generate 1000 samples and visualize the results
-
-    sh scripts/sample_gen.sh
-
-Run this evaluation script to get JSD, MMD, and COV scores. Warning: this step can be very slow.
+For evaluation, uncomment the eval section in ```sample_uncond.sh```, this would generate > 10,000 samples. Then compute JSD, MMD, and COV scores. Warning: this step can be very slow.
 
     sh scripts/eval.sh
 
-Please also download the test set from [here](https://drive.google.com/file/d/1FhONYaJTK2vkayfDKH5TaHXDyjl2f4f-/view?usp=sharing) and unzip it inside the ```data``` folder. This is required to compute the evaluation metrics.
+Please also download the test set from [here](https://drive.google.com/file/d/1FhONYaJTK2vkayfDKH5TaHXDyjl2f4f-/view?usp=sharing) and unzip it inside the ```data``` folder. This is required for computing the evaluation metrics.
+
+
+
+### Conditional Generation
+
+Train the full model including model encoder for conditional CAD generation (e.g. autocompletion) 
+
+    sh scripts/gen_cond.sh
+
+For testing, run this script to generate auto-complete resuls from partial sketch and extrude input.
+
+    sh scripts/sample_uncond.sh
+
 
 
 
