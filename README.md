@@ -70,6 +70,7 @@ After the codebooks are learned, extract the neural codes corresponding to each 
     sh scripts/extract_code.sh
 
 Pretrained weights for the three codebook networks are available [here](https://drive.google.com/file/d/1AA3OLKFgvmmSojyNLzXANw-FPnZLi8x8/view?usp=sharing). 
+
 You can also download the extracted codes from [here](https://drive.google.com/file/d/1odP_K7l7TilarYgFHFOOIFMGlvlceuc0/view?usp=sharing).
 
 
@@ -123,4 +124,4 @@ If you find our work useful in your research, please cite the following paper
 - [x] Core model code is released
 - [x] CAD generation code is released
 - [x] CAD autocompletion code
-- [ ] Pretrained weights
+- [x] Pretrained weights
