@@ -42,7 +42,7 @@ We use the dataset from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD) for tr
 
 The sketch-and-extrude sequences need to be converted to our obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen). 
 
-You can run the following script to download our post-processed raw data 
+Run the following script to download our post-processed raw data 
 
     python scripts/download.py
 
@@ -69,7 +69,8 @@ After the codebooks are learned, extract the neural codes corresponding to each 
 
     sh scripts/extract_code.sh
 
-Pretrained weights for the three codebook networks are available [here](https://drive.google.com/file/d/1AA3OLKFgvmmSojyNLzXANw-FPnZLi8x8/view?usp=sharing). You can also download the extracted codes from [here](https://drive.google.com/file/d/1odP_K7l7TilarYgFHFOOIFMGlvlceuc0/view?usp=sharing).
+Pretrained weights for the three codebook networks are available [here](https://drive.google.com/file/d/1AA3OLKFgvmmSojyNLzXANw-FPnZLi8x8/view?usp=sharing). 
+You can also download the extracted codes from [here](https://drive.google.com/file/d/1odP_K7l7TilarYgFHFOOIFMGlvlceuc0/view?usp=sharing).
 
 
 ### Random Generation
@@ -95,7 +96,7 @@ Train the full model including model encoder for conditional CAD generation (e.g
 
     sh scripts/gen_cond.sh
 
-For testing, run this script to generate auto-complete resuls from partial sketch and extrude input.
+For testing, run this script to generate auto-complete results from partial sketch-and-extrude input.
 
     sh scripts/sample_uncond.sh
 
@@ -121,5 +122,5 @@ If you find our work useful in your research, please cite the following paper
 - [x] Data preprocess code is released
 - [x] Core model code is released
 - [x] CAD generation code is released
-- [ ] CAD autocompletion code
+- [x] CAD autocompletion code
 - [ ] Pretrained weights
