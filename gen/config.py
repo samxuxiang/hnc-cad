@@ -39,13 +39,10 @@ AUG_RANGE = 2
 #################
 # Sample Config #
 #################
-code_top_k = 0
-code_top_p = 0.98
-sketch_top_k = 0
-sketch_top_p = 0.95
-ext_top_k = 0
-ext_top_p = 0.95
-RANDOM_SAMPLE_TOTAL = 1000 
-RANDOM_SAMPLE_BS = 32   
-# RANDOM_SAMPLE_TOTAL = 15000  [use this for evaluation]
-# RANDOM_SAMPLE_BS = 512   
+code_top_p = 0.99
+top_p_sample = 0.9
+top_p_eval = 0.99
+RANDOM_SAMPLE_TOTAL = 2000
+RANDOM_SAMPLE_BS = 32     
+RANDOM_EVAL_TOTAL = 15000
+RANDOM_EVAL_BS = 1024  

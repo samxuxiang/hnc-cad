@@ -64,9 +64,8 @@ class SketchDecoder(nn.Module):
     return pixel_logits
 
 
-  def sample(self, code, code_mask):
-    top_k = sketch_top_k
-    top_p = sketch_top_p
+  def sample(self, code, code_mask, top_p):
+    top_k = 0
     
     # Mapping from pixel index to xy coordiante
     pixel2xy = {}
@@ -204,9 +203,8 @@ class ExtDecoder(nn.Module):
     return logits
 
 
-  def sample(self, code, code_mask, xy_samples):
-    top_k = ext_top_k
-    top_p = ext_top_p
+  def sample(self, code, code_mask, xy_samples, top_p):
+    top_k = 0
     
     # Mapping from pixel index to xy coordiante
     cad_samples = []

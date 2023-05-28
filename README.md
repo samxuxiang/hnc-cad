@@ -89,7 +89,7 @@ If you want to try CAD generation without training the model, you can download o
 
 
 ## Acknowledgement
-This research is partially supported by NSERC Discovery Grants with Accelerator Supplements and DND/NSERC Discovery Grant Supplement.
+This research is partially supported by NSERC Discovery Grants with Accelerator Supplements and DND/NSERC Discovery Grant Supplement, NSERC Alliance Grants, and John R. Evans Leaders Fund (JELF).
     
 ## Citation
 If you find our work useful in your research, please cite the following paper

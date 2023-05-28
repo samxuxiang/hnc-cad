@@ -57,7 +57,7 @@ class CodeModel(nn.Module):
     """
     sample from distribution (top-k, top-p)
     """
-    top_k = code_top_k
+    top_k = 0
     top_p = code_top_p
 
     for k in range(MAX_CODE):
