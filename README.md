@@ -23,7 +23,7 @@ three-level hierarchical tree of neural codes, from global part arrangement down
 
 ### Dependencies
 - PyTorch >= 1.10
-- Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
+- Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core) (use mamba if conda is too slow).
 - Install other dependencies with ```pip install -r requirements.txt```
 
 We also provide the [docker image](https://hub.docker.com/r/samxuxiang/skexgen). Note: only tested on CUDA 11.4. 
