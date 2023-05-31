@@ -1,7 +1,7 @@
 #!/bin/bash\
 
-python gen/ac_gen.py --output result/ac --weight ./proj_log/gen \
-                --solid_code solid.pkl --profile_code  profile.pkl --loop_code loop.pkl --mode cond --device 0 
+python gen/ac_gen.py --output result/ac --weight proj_log/gen_full \
+                --solid_code solid.pkl --profile_code  profile.pkl --loop_code loop.pkl --mode cond --device 0
 
 # convert obj format to stl & step
 python gen/convert.py --data_folder result/ac

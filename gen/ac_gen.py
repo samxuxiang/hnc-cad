@@ -1,16 +1,13 @@
 import os
 import torch
 import argparse
-from tqdm import tqdm
 from config import *
-import multiprocessing
 from hashlib import sha256
 import numpy as np 
 from dataset import CADData
 from utils import CADparser, write_obj_sample
-from model.encoder import SketchEncoder, ExtEncoder, CodeEncoder
+from model.encoder import SketchEncoder, ExtEncoder
 from model.decoder import SketchDecoder, ExtDecoder, CodeDecoder
-from torch.utils.data.dataloader import default_collate
 
 
 def raster_cad(coord, ext): 
@@ -48,7 +45,7 @@ def sample(args):
     sketch_enc.load_state_dict(torch.load(os.path.join(args.weight, 'sketch_enc_epoch_250.pt')))
     sketch_enc.cuda().eval()
 
-    sketch_dec = SketchDecoder() 
+    sketch_dec = SketchDecoder(args.mode, num_code=code_size) 
     sketch_dec.load_state_dict(torch.load(os.path.join(args.weight, 'sketch_dec_epoch_250.pt')))
     sketch_dec.cuda().eval()
 
@@ -56,48 +53,37 @@ def sample(args):
     ext_enc.load_state_dict(torch.load(os.path.join(args.weight, 'ext_enc_epoch_250.pt')))
     ext_enc.cuda().eval()
 
-    ext_dec = ExtDecoder() 
+    ext_dec = ExtDecoder(args.mode, num_code=code_size) 
     ext_dec.load_state_dict(torch.load(os.path.join(args.weight, 'ext_dec_epoch_250.pt')))
     ext_dec.cuda().eval()
 
-    code_enc = CodeEncoder(code_size)
-    code_enc.load_state_dict(torch.load(os.path.join(args.weight, 'code_enc_epoch_250.pt')))
-    code_enc.cuda().eval()
-
-    code_dec = CodeDecoder(code_size, args.mode)
+    code_dec = CodeDecoder(args.mode, code_size)
     code_dec.load_state_dict(torch.load(os.path.join(args.weight, 'code_dec_epoch_250.pt')))
     code_dec.cuda().eval()
 
     # Random sampling 
     code_bsz = 50 # every partial input samples this many neural codes
     count = 0
-    for pixel_p, coord_p, sketch_mask_p, ext_p, ext_mask_p, pixel, coord, sketch_mask, ext, ext_mask, code, code_mask in dataloader:
-        if count>50:break # only visualize the first 50 exames
+    for pixel_p, coord_p, sketch_mask_p, ext_p, ext_mask_p, _, _, _, _, _, _, _ in dataloader:
+        if count>50:break # only visualize the first 50 examples
         pixel_p = pixel_p.cuda()
         coord_p = coord_p.cuda()
         sketch_mask_p = sketch_mask_p.cuda()
         ext_p = ext_p.cuda()
         ext_mask_p = ext_mask_p.cuda()
-        pixel = pixel.cuda()
-        coord = coord.cuda()
-        sketch_mask = sketch_mask.cuda()
-        ext = ext.cuda()
-        ext_mask = ext_mask.cuda()
-        code = code.cuda()
-        code_mask = code_mask.cuda()
 
         # encode partial CAD model
         latent_sketch = sketch_enc(pixel_p, coord_p, sketch_mask_p)
         latent_extrude = ext_enc(ext_p, ext_mask_p)
 
-        # auto-complete the full neural codes
+        # generate the neural code tree
         latent_z = torch.cat([latent_sketch, latent_extrude], 1)
         latent_mask = torch.cat([sketch_mask_p, ext_mask_p], 1)
         code_sample = code_dec.sample(n_samples=code_bsz, latent_z=latent_z.repeat(code_bsz, 1, 1), 
-                                      latent_mask=latent_mask.repeat(code_bsz, 1), top_k=0, top_p=0.9)
+                                      latent_mask=latent_mask.repeat(code_bsz, 1), top_k=0, top_p=0.95)
         
         # filter code, only keep unique code
-        if len(code_sample)==0:
+        if len(code_sample)<3:
             continue 
         code_unique = {}
         for ii in range(len(code_sample)):
@@ -107,8 +93,6 @@ def sample(args):
             code_uid = code.tobytes()
             if code_uid not in code_unique:
                 code_unique[code_uid] = code
-        
-        # auto-complete the full CAD model
         total_code = []
         total_code_mask = []
         for _, code in code_unique.items():
@@ -120,31 +104,27 @@ def sample(args):
         total_code = torch.LongTensor(total_code).cuda()
         total_code_mask = torch.BoolTensor(total_code_mask).cuda()
 
-        latent_code = code_enc(total_code)
-        latent_sketch = sketch_enc(pixel_p, coord_p, sketch_mask_p)
-        latent_extrude = ext_enc(ext_p, ext_mask_p)
-        latent_z = torch.cat([latent_sketch.repeat(len(latent_code),1,1), latent_extrude.repeat(len(latent_code),1,1), latent_code], 1)
-        latent_mask = torch.cat([sketch_mask_p.repeat(len(total_code_mask),1), ext_mask_p.repeat(len(total_code_mask),1), total_code_mask], 1)
-
-        xy_samples, _latent_z_, _latent_mask_ = sketch_dec.sample(latent_z, latent_mask, top_k=1, top_p=0)
-        assert len(xy_samples) == len(_latent_z_)
-        assert len(_latent_mask_) == len(_latent_z_)
-        cad_samples = ext_dec.sample(_latent_z_, _latent_mask_, xy_samples, top_k=1, top_p=0)
-
-        # raster cad
+        # generate the full CAD model
+        latent_z = latent_z.repeat(len(total_code), 1, 1)
+        latent_mask = latent_mask.repeat(len(total_code), 1)
+        xy_samples, _code_, _code_mask_, _latent_z_, _latent_mask_ = sketch_dec.sample(total_code, total_code_mask, latent_z, latent_mask, top_k=1, top_p=0)
+        cad_samples = ext_dec.sample(xy_samples, _code_, _code_mask_, _latent_z_, _latent_mask_, top_k=1, top_p=0)
+       
+        # raster user input cad
         try:
             cad_obj = raster_cad(coord_p.detach().cpu().numpy()[0], ext_p.detach().cpu().numpy()[0])
-            save_folder = os.path.join(result_folder, str(count).zfill(4)+'_partial')
+            save_folder = os.path.join(result_folder, str(count).zfill(4)+'_origInput')
             if not os.path.exists(save_folder):
                 os.makedirs(save_folder)
             write_obj_sample(save_folder, cad_obj)
         except Exception as error_msg:  
             continue 
 
+        # raster auto-completed cad
         for ii, sample in enumerate(cad_samples):
             try:
                 cad_obj = raster_cad(sample[0], sample[1])
-                save_folder = os.path.join(result_folder, str(count).zfill(4)+'_predicted'+str(ii))
+                save_folder = os.path.join(result_folder, str(count).zfill(4)+'_postAC'+str(ii))
                 if not os.path.exists(save_folder):
                     os.makedirs(save_folder)
                 write_obj_sample(save_folder, cad_obj)

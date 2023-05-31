@@ -54,18 +54,3 @@ class ExtEncoder(nn.Module):
     input_embeds = self.pos_embed(embed_inputs.transpose(0,1))
     outputs = self.encoder(src=input_embeds, src_key_padding_mask=mask)  # [seq_len, bs, dim]    
     return outputs.transpose(0,1)
-
-
-
-class CodeEncoder(nn.Module):
-
-  def __init__(self, num_code):
-    super(CodeEncoder, self).__init__()
-    self.embed_dim = ENCODER_CONFIG['embed_dim']
-    self.code_embed = Embedder(num_code+CODE_PAD, self.embed_dim)
-    self.pos_embed = PositionalEncoding(max_len=MAX_CODE, d_model=self.embed_dim)
-
-  def forward(self, code):
-    """ forward pass """    
-    code_z = self.code_embed(code) 
-    return self.pos_embed(code_z.transpose(0,1)).transpose(0,1)

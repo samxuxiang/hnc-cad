@@ -49,10 +49,11 @@ MASK_RATIO_HIGH = 1.0
 #################
 # Sample Config #
 #################
-code_top_p = 0.99
-top_p_sample = 0.95
-top_p_eval = 0.99
-RANDOM_SAMPLE_TOTAL = 2000
+code_top_p_sample = 0.98
+code_top_p_eval = 1.0 
+cad_top_p_sample = 0.5  # nucleus sampling has better visual quality
+cad_top_p_eval = 1.0 # simply sample based on the distribution
+RANDOM_SAMPLE_TOTAL = 1000  # visualize 1000 randomly generated samples
 RANDOM_SAMPLE_BS = 32     
-RANDOM_EVAL_TOTAL = 15000
+RANDOM_EVAL_TOTAL = 15000 # need more generated data for evaluation purpose
 RANDOM_EVAL_BS = 1024  

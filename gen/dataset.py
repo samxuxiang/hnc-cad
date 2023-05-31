@@ -43,11 +43,10 @@ class CADData(torch.utils.data.Dataset):
             num_se = len(cad['cad_ext'])
 
             if self.mode == 'cond' and num_se==1:continue #skip single SE for auto-complete
-        
+           
             sketchProfileCode = []
             sketchLoopCode = []
             valid = True
-
             for idx_se in range(num_se):
                 # Profile code
                 profile_uid = solid_uid+'_'+str(idx_se)                  

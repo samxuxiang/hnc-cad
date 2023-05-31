@@ -7,7 +7,6 @@ import multiprocessing
 from hashlib import sha256
 import numpy as np 
 from dataset import CADData
-from model.encoder import CodeEncoder
 from model.decoder import SketchDecoder, ExtDecoder, CodeDecoder
 from utils import CADparser, write_obj_sample
 
@@ -45,48 +44,46 @@ def parse_aug(args):
         "sample": RANDOM_SAMPLE_BS,
         "eval": RANDOM_EVAL_BS,
     }
-    top_p = {
-        "sample": top_p_sample,
-        "eval": top_p_eval,
+    code_top_p = {
+        "sample": code_top_p_sample,
+        "eval": code_top_p_eval,
     }
-    return total_size[args.mode], bsz_size[args.mode], top_p[args.mode]
+    cad_top_p = {
+        "sample": cad_top_p_sample,
+        "eval": cad_top_p_eval,
+    }
+    return total_size[args.mode], bsz_size[args.mode], code_top_p[args.mode], cad_top_p[args.mode]
 
 
 @torch.inference_mode()
 def sample(args):
-    total_size, bsz, top_p = parse_aug(args)
+    total_size, bsz, code_top_p, cad_top_p = parse_aug(args)
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     dataset = CADData(CAD_TRAIN_PATH, args.solid_code, args.profile_code, args.loop_code, mode='uncond')
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=False, 
-                                             batch_size=1024,
+                                             batch_size=32,
                                              num_workers=4)
     code_size = dataset.solid_unique_num + dataset.profile_unique_num + dataset.loop_unique_num
     
     # Load model weights
-    tokenPredS = SketchDecoder() 
-    tokenPredS.load_state_dict(torch.load(os.path.join(args.cad_weight, 'sketch_dec_epoch_350.pt')))
-    tokenPredS = tokenPredS.cuda().eval()
+    sketch_dec = SketchDecoder(mode='uncond', num_code=code_size) 
+    sketch_dec.load_state_dict(torch.load(os.path.join(args.cad_weight, 'sketch_dec_epoch_350.pt')))
+    sketch_dec = sketch_dec.cuda().eval()
 
-    tokenPredE = ExtDecoder() 
-    tokenPredE.load_state_dict(torch.load(os.path.join(args.cad_weight, 'ext_dec_epoch_350.pt')))
-    tokenPredE = tokenPredE.cuda().eval()
+    ext_dec = ExtDecoder(mode='uncond', num_code=code_size) 
+    ext_dec.load_state_dict(torch.load(os.path.join(args.cad_weight, 'ext_dec_epoch_350.pt')))
+    ext_dec = ext_dec.cuda().eval()
 
-    codePred = CodeDecoder(code_size, mode='uncond')
-    codePred.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_350.pt')))
-    codePred = codePred.cuda().eval()
-
-    code_enc = CodeEncoder(code_size)
-    code_enc.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_350.pt')))
-    code_enc = code_enc.to(device).train()
+    code_dec = CodeDecoder(mode='uncond', num_code=code_size)
+    code_dec.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_dec_epoch_350.pt')))
+    code_dec = code_dec.cuda().eval()
 
     # Random sampling 
     sample_cad = []
     while len(sample_cad) < total_size:
         # Sample code
-        codes = codePred.sample(n_samples=bsz).detach().cpu().numpy()
-
-        # Pad codes
+        codes = code_dec.sample(n_samples=bsz, latent_z=None, latent_mask=None, top_k=0, top_p=code_top_p).detach().cpu().numpy() 
         codes_pad = []
         codes_pad_mask = []
         for code in codes:
@@ -98,12 +95,12 @@ def sample(args):
             codes_pad_mask.append(code_mask)
         codes_pad = torch.LongTensor(np.vstack(codes_pad)).cuda()
         codes_pad_mask = torch.BoolTensor(np.vstack(codes_pad_mask)).cuda()
-       
+
         # Sample CAD
-        xy_samples, _latent_code_, _codes_pad_mask_ = tokenPredS.sample(codes_pad, codes_pad_mask, top_p)
-        assert len(xy_samples) == len(_latent_code_)
-        assert len(_codes_pad_mask_) == len(_latent_code_)
-        cad_samples = tokenPredE.sample(_latent_code_, _codes_pad_mask_, xy_samples, top_p)
+        xy_samples, _code_, _codes_pad_mask_, _, _ = sketch_dec.sample(codes_pad, codes_pad_mask, 
+                                                                              latent=None, latent_mask=None,top_k=0, top_p=cad_top_p)
+        cad_samples = ext_dec.sample(xy_samples, _code_, _codes_pad_mask_, 
+                                        latent=None, latent_mask=None, top_k=0, top_p=cad_top_p)
 
         sample_cad+=cad_samples
         print(len(sample_cad))

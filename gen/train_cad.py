@@ -7,7 +7,6 @@ from dataset import CADData
 import torch.nn as nn
 import torch.nn.functional as F 
 from torch.utils.tensorboard import SummaryWriter
-from model.encoder import CodeEncoder
 from model.decoder import SketchDecoder, ExtDecoder
 from model.network import schedule_with_warmup
 
@@ -18,7 +17,7 @@ def train(args):
     device = torch.device("cuda:0")
 
     # Initialize dataset loader
-    dataset = CADData(CAD_TRAIN_PATH, args.solid_code, args.profile_code, args.loop_code, args.mode)
+    dataset = CADData(CAD_TRAIN_PATH, args.solid_code, args.profile_code, args.loop_code, args.mode, is_training=True)
     code_size = dataset.solid_unique_num + dataset.profile_unique_num + dataset.loop_unique_num
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
@@ -26,19 +25,15 @@ def train(args):
                                              num_workers=6)
     
     # Initialize models    
-    sketch_dec = SketchDecoder() 
+    sketch_dec = SketchDecoder(args.mode, num_code=code_size) 
     sketch_dec = nn.DataParallel(sketch_dec)
     sketch_dec = sketch_dec.to(device).train()
 
-    ext_dec = ExtDecoder() 
+    ext_dec = ExtDecoder(args.mode, num_code=code_size) 
     ext_dec = nn.DataParallel(ext_dec)
     ext_dec = ext_dec.to(device).train()
 
-    code_enc = CodeEncoder(code_size)
-    code_enc = nn.DataParallel(code_enc)
-    code_enc = code_enc.to(device).train()
-
-    params = list(sketch_dec.parameters()) + list(ext_dec.parameters()) + list(code_enc.parameters())
+    params = list(sketch_dec.parameters()) + list(ext_dec.parameters())
     optimizer = torch.optim.AdamW(params, lr=1e-3)
     scheduler = schedule_with_warmup(optimizer, 2000)
     writer = SummaryWriter(log_dir=args.output)
@@ -61,14 +56,11 @@ def train(args):
             pixel_aug = pixel_aug.to(device)
             coord_aug = coord_aug.to(device)
 
-            # Code embedding 
-            latent_code = code_enc(code)
-
             # Pass through sketch decoder
-            sketch_logits = sketch_dec(pixel_aug[:, :-1], coord_aug[:, :-1, :], latent_code, code_mask)
+            sketch_logits = sketch_dec(pixel_aug[:, :-1], coord_aug[:, :-1, :], code, code_mask)
             
             # Pass through extrude decoder
-            ext_logits = ext_dec(ext[:, :-1], latent_code, code_mask)
+            ext_logits = ext_dec(ext[:, :-1], code, code_mask)
 
             # Compute loss
             valid_mask =  (~sketch_mask).reshape(-1) 
@@ -105,7 +97,6 @@ def train(args):
         if (epoch+1) % 50 == 0:
             torch.save(sketch_dec.module.state_dict(), os.path.join(args.output,'sketch_dec_epoch_'+str(epoch+1)+'.pt'))
             torch.save(ext_dec.module.state_dict(), os.path.join(args.output,'ext_dec_epoch_'+str(epoch+1)+'.pt'))
-            torch.save(code_enc.module.state_dict(), os.path.join(args.output,'code_enc_epoch_'+str(epoch+1)+'.pt'))
             
     writer.close()
 

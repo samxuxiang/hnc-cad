@@ -1,9 +1,9 @@
 #!/bin/bash\
 
-# sample surface point cloud
-python gen/sample_points.py --in_dir result/eval --out_dir pcd 
+# sample surface point cloud (please convert obj format to stl & step first)
+python gen/sample_points.py --in_dir result/random_eval --out_dir pcd 
 
 # run evaluation script
-python gen/eval_cad.py --fake result/eval --real data/testset
+CUDA_VISIBLE_DEVICES=0 python gen/eval_cad.py --fake result/random_eval --real data/testset
 
 

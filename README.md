@@ -12,14 +12,6 @@
 Computer Aided Design (CAD) that 1) represents high-level design concepts of a CAD model as a
 three-level hierarchical tree of neural codes, from global part arrangement down to local curve geometry; and 2) controls the generation of CAD models by specifying the target design using a code tree. Our method supports diverse and higher-quality generation; novel user controls while specifying design intent; and autocompleting a partial CAD model under construction.
 
-<!-- <p align="center">
-<img src="https://github.com/threedle/GeoCode/releases/download/v.1.0.0/demo_video_chair.gif" width=250 alt="3D shape recovery"/>
-<img src="https://github.com/threedle/GeoCode/releases/download/v.1.0.0/demo_video_vase.gif" width=250 alt="3D shape recovery"/>
-<img src="https://github.com/threedle/GeoCode/releases/download/v.1.0.0/demo_video_table.gif" width=250 alt="3D shape recovery"/>
-</p>
-<p align="center">
-A demo video of our program is available on our <a href="https://threedle.github.io/GeoCode/">project page</a>.
-</p> -->
 
 ## Requirements
 
@@ -40,14 +32,14 @@ We also provide the [docker image](https://hub.docker.com/r/samxuxiang/skexgen).
 ## Dataset 
 We use the dataset from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD) for training and evaluation.
 
-The sketch-and-extrude sequences need to be converted to our obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen). 
+The sketch-and-extrude sequences need to be first converted to our obj format following the steps from [SkexGen](https://github.com/samxuxiang/SkexGen). 
 
-Run the following script to download our post-processed raw data 
+Run the following script to download our post-processed DeepCAD data in obj format
 
     python scripts/download.py
 
 
-After the raw data is downloaded, run this script to get the solid, profile, loop and full CAD Model data
+After the data is downloaded, run this script to get the solid, profile, loop and CAD model data
 
     sh scripts/process.sh
 
@@ -55,6 +47,8 @@ After the raw data is downloaded, run this script to get the solid, profile, loo
 Run the deduplication script, this will output post-filtered data as ```train_deduplicate.pkl```
 
     sh scripts/deduplicate.sh
+
+Download the ready-to-use [post-deduplicate data](https://drive.google.com/file/d/1U4UuhFzs7BenViVD5tqoQzH72jbE_oKi/view?usp=sharing).
 
 
 
@@ -65,13 +59,13 @@ Train the three-level codebook with
 
     sh scripts/codebook.sh
 
-After the codebooks are learned, extract the neural codes corresponding to each training data with
+Download our pretrained codebook module from [here](https://drive.google.com/file/d/1UXvF3fsRM1RxxtArxvBu--t0foU_6ZwR/view?usp=sharing). 
+
+After the codebooks are trained, extract the neural codes corresponding to each training data with
 
     sh scripts/extract_code.sh
 
-Pretrained weights for the three codebook networks are available [here](https://drive.google.com/file/d/1AA3OLKFgvmmSojyNLzXANw-FPnZLi8x8/view?usp=sharing). 
-
-You can also download the extracted codes from [here](https://drive.google.com/file/d/1odP_K7l7TilarYgFHFOOIFMGlvlceuc0/view?usp=sharing).
+Extracted codes from the pretrained model are available [here](https://drive.google.com/file/d/1uoCcwMGFftgouaH4evg0dDKfS3MtgEIR/view?usp=sharing).
 
 
 ### Random Generation
@@ -79,27 +73,28 @@ Run the following script to train the code-tree generator and model generator fo
 
     sh scripts/gen_uncond.sh
 
+Download our pretrained unconditional generation module from [here](https://drive.google.com/file/d/1WtyLAwSam5iA-ju9VxgARKzUDEvQyuOE/view?usp=sharing). 
+
 For testing, run this script to generate 1000 CAD samples and visualize the results
 
     sh scripts/sample_uncond.sh
 
-For evaluation, uncomment the eval section in ```sample_uncond.sh```, this would generate > 10,000 samples. Then compute JSD, MMD, and COV scores. Warning: this step can be very slow.
+For evaluation, uncomment the eval script in ```sample_uncond.sh```, this would generate > 10,000 samples. Then compute JSD, MMD, and COV scores using ```eval.sh```. Warning: this step can be very slow.
 
     sh scripts/eval.sh
 
-Please also download the test set from [here](https://drive.google.com/file/d/1FhONYaJTK2vkayfDKH5TaHXDyjl2f4f-/view?usp=sharing) and unzip it inside the ```data``` folder. This is required for computing the evaluation metrics.
-
+Please also download the [test data](https://drive.google.com/file/d/1FhONYaJTK2vkayfDKH5TaHXDyjl2f4f-/view?usp=sharing) and unzip it inside the ```data``` folder. This is required for computing the evaluation metrics.
 
 
 ### Conditional Generation
 
-Train the full model including model encoder for conditional CAD generation (e.g. autocompletion) 
+Train the full model including model encoder for conditional CAD generation
 
     sh scripts/gen_cond.sh
 
-For testing, run this script to generate auto-complete results from partial sketch-and-extrude input.
+For testing (e.g CAD autocomplete), run this script to generate full CAD model from partial extruded profiles.
 
-    sh scripts/sample_uncond.sh
+    sh scripts/sample_cond.sh
 
 
 
@@ -118,10 +113,3 @@ If you find our work useful in your research, please cite the following paper
   year      = {2023},
 }
 ```
-
-## :hourglass_flowing_sand: UPDATES
-- [x] Data preprocess code is released
-- [x] Core model code is released
-- [x] CAD generation code is released
-- [x] CAD autocompletion code
-- [x] Pretrained weights

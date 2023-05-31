@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F 
 from torch.utils.tensorboard import SummaryWriter
 from model.network import schedule_with_warmup
-from model.encoder import SketchEncoder, ExtEncoder, CodeEncoder
+from model.encoder import SketchEncoder, ExtEncoder
 from model.decoder import SketchDecoder, ExtDecoder, CodeDecoder
 
 
@@ -24,14 +24,14 @@ def train(args):
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
-                                             num_workers=8)
+                                             num_workers=6)
     
     # Initialize models    
-    sketch_dec = SketchDecoder() 
+    sketch_dec = SketchDecoder(args.mode, num_code=code_size) 
     sketch_dec = nn.DataParallel(sketch_dec)
     sketch_dec = sketch_dec.to(device).train()
 
-    ext_dec = ExtDecoder() 
+    ext_dec = ExtDecoder(args.mode, num_code=code_size) 
     ext_dec = nn.DataParallel(ext_dec)
     ext_dec = ext_dec.to(device).train()
 
@@ -43,15 +43,11 @@ def train(args):
     ext_enc = nn.DataParallel(ext_enc)
     ext_enc = ext_enc.to(device).train()
 
-    code_enc = CodeEncoder(code_size)
-    code_enc = nn.DataParallel(code_enc)
-    code_enc = code_enc.to(device).train()
-
-    code_dec = CodeDecoder(code_size, args.mode)
+    code_dec = CodeDecoder(args.mode, code_size)
     code_dec = nn.DataParallel(code_dec)
     code_dec.to(device).train()
 
-    params = list(ext_enc.parameters()) +list(sketch_enc.parameters()) + list(code_enc.parameters()) +\
+    params = list(ext_enc.parameters()) +list(sketch_enc.parameters()) +\
              list(sketch_dec.parameters()) + list(ext_dec.parameters()) + list(code_dec.parameters())
     optimizer = torch.optim.AdamW(params, lr=1e-3)
     scheduler = schedule_with_warmup(optimizer, 2000)
@@ -78,27 +74,21 @@ def train(args):
             code = code.to(device)
             code_mask = code_mask.to(device)
 
-            # Code embedding 
-            latent_code = code_enc(code)
-
             # Partial Token Encoder
             latent_sketch = sketch_enc(pixel_p, coord_p, sketch_mask_p)
             latent_extrude = ext_enc(ext_p, ext_mask_p)
 
-            latent_z1 = torch.cat([latent_sketch, latent_extrude, latent_code], 1)
-            latent_mask1 = torch.cat([sketch_mask_p, ext_mask_p, code_mask], 1)
-
-            latent_z2 = torch.cat([latent_sketch, latent_extrude], 1)
-            latent_mask2 = torch.cat([sketch_mask_p, ext_mask_p], 1)
+            latent_z = torch.cat([latent_sketch, latent_extrude], 1)
+            latent_mask = torch.cat([sketch_mask_p, ext_mask_p], 1)
 
             # Pass through sketch decoder
-            sketch_logits = sketch_dec(pixel[:, :-1], coord[:, :-1, :], latent_z1, latent_mask1)
+            sketch_logits = sketch_dec(pixel[:, :-1], coord[:, :-1, :], code, code_mask, latent_z, latent_mask)
             
             # Pass through extrude decoder
-            ext_logits = ext_dec(ext[:, :-1], latent_z1, latent_mask1)
+            ext_logits = ext_dec(ext[:, :-1], code, code_mask, latent_z, latent_mask)
 
             # Pass through code decoder
-            code_logits = code_dec(code[:, :-1], latent_z2, latent_mask2)
+            code_logits = code_dec(code[:, :-1], latent_z, latent_mask)
 
             # Compute losses
             valid_mask =  (~sketch_mask).reshape(-1) 
@@ -141,7 +131,6 @@ def train(args):
         if (epoch+1) % 10 == 0:
             torch.save(sketch_dec.module.state_dict(), os.path.join(args.output,'sketch_dec_epoch_'+str(epoch+1)+'.pt'))
             torch.save(ext_dec.module.state_dict(), os.path.join(args.output,'ext_dec_epoch_'+str(epoch+1)+'.pt'))
-            torch.save(code_enc.module.state_dict(), os.path.join(args.output,'code_enc_epoch_'+str(epoch+1)+'.pt'))
             torch.save(sketch_enc.module.state_dict(), os.path.join(args.output,'sketch_enc_epoch_'+str(epoch+1)+'.pt'))
             torch.save(ext_enc.module.state_dict(), os.path.join(args.output,'ext_enc_epoch_'+str(epoch+1)+'.pt'))
             torch.save(code_dec.module.state_dict(), os.path.join(args.output,'code_dec_epoch_'+str(epoch+1)+'.pt'))
