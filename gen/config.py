@@ -24,7 +24,7 @@ CAD_TRAIN_PATH = 'data/model/train_deduplicate.pkl'
 ENCODER_CONFIG = {
     'hidden_dim': 512,
     'embed_dim': 256,  
-    'num_layers': 5,   
+    'num_layers': 6,   
     'num_heads': 8,
     'dropout_rate': 0.1
 }

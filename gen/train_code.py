@@ -24,6 +24,7 @@ def train(args):
                                              num_workers=6)
     code_size = dataset.solid_unique_num + dataset.profile_unique_num + dataset.loop_unique_num
     model = CodeDecoder(args.mode, code_size)
+    model = nn.DataParallel(model)
     model = model.to(device).train()
     
     # Initialize optimizer
@@ -72,7 +73,7 @@ def train(args):
 
         # save model after n epoch
         if (epoch+1) % 50 == 0:
-            torch.save(model.state_dict(), os.path.join(args.output,'code_dec_epoch_'+str(epoch+1)+'.pt'))
+            torch.save(model.module.state_dict(), os.path.join(args.output,'code_dec_epoch_'+str(epoch+1)+'.pt'))
 
     writer.close()
 
