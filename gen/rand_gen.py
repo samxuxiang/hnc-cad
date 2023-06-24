@@ -76,7 +76,7 @@ def sample(args):
     ext_dec = ext_dec.cuda().eval()
 
     code_dec = CodeDecoder(mode='uncond', num_code=code_size)
-    code_dec.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_dec_epoch_350.pt')))
+    code_dec.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_350.pt')))
     code_dec = code_dec.cuda().eval()
 
     # Random sampling 
