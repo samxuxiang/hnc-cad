@@ -73,7 +73,7 @@ Run the following script to train the code-tree generator and model generator fo
 
     sh scripts/gen_uncond.sh
 
-Download our pretrained unconditional generation module from [here](https://drive.google.com/file/d/1WtyLAwSam5iA-ju9VxgARKzUDEvQyuOE/view?usp=sharing). 
+Download our pretrained unconditional generation module from [here](https://drive.google.com/file/d/142PMsq3i0mXJMnCkcf-o63DBrU0fe6Sj/view?usp=sharing). 
 
 For testing, run this script to generate 1000 CAD samples and visualize the results
 
