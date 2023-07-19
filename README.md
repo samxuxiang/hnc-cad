@@ -106,10 +106,10 @@ This research is partially supported by NSERC Discovery Grants with Accelerator 
 ## Citation
 If you find our work useful in your research, please cite the following paper
 ```
-@inproceedings{xu2023hnc,
-  author    = {Xiang Xu, Pradeep Kumar Jayaraman, Joseph G. Lambourne, Karl D.D. Willis, Yasutaka Furukawa},
-  title     = {Hierarchical Neural Coding for Controllable CAD Model Generation},
-  journal   = {ICML},
-  year      = {2023},
+@article{xu2023hierarchical,
+  title={Hierarchical Neural Coding for Controllable CAD Model Generation},
+  author={Xu, Xiang and Jayaraman, Pradeep Kumar and Lambourne, Joseph G and Willis, Karl DD and Furukawa, Yasutaka},
+  journal={arXiv preprint arXiv:2307.00149},
+  year={2023}
 }
 ```
