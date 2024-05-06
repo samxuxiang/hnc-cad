@@ -219,6 +219,10 @@ def downsample_pc(points, n):
 
 
 def normalize_pc(points):
+    # normalize
+    mean = np.mean(points, axis=0)
+    points = (points - mean) 
+    # fit to unit cube
     scale = np.max(np.abs(points))  
     points = points / scale
     return points
